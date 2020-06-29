@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gok8s-demo
+  namespace: default
+  labels:
+    app: gok8s-demo
+spec:
+  selector:
+    matchLabels:
+      app: gok8s-demo
+  replicas: 4
+  revisionHistoryLimit: 10
+  minReadySeconds: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: gok8s-demo
+    spec:
+      containers:
+        - image: cbping/gok8s:1.0
+          imagePullPolicy: IfNotPresent
+          name: gok8s-demo
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /go/src/app
+              name: config
+          resources:
+            limits:
+              cpu: 100m
+              memory: 100Mi
+            requests:
+              cpu: 50m
+              memory: 50Mi
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: 8080
+            initialDelaySeconds: 10
+            timeoutSeconds: 2
+        volumes:
+          - name: config
+            configMap:
+              name: gok8s-config
+              items:
+                - key: configkey
+                  path: config.json
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gok8s-demo-svc
+  namespace: default
+  labels:
+    app: gok8s-demo
+spec:
+  ports:
+    - name: api
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: gok8s-demo
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: gok8s-demo-ingress
+  namespace: default
+spec:
+  rules:
+    - host: gok8s-demo.local
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: gok8s-demo-svc
+              servicePort: 8080

@@ -1,0 +1,12 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: gok8s-config
+  namespace: default
+data:
+  configkey: "{
+         \"addr\": \":8080\",
+          \"version\": \"V1.0-configMap\"
+}"
+
+

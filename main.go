@@ -1,28 +1,49 @@
 package main
 
 import (
-	"fmt"
-	"io"
-	"log"
+	"encoding/json"
+	"io/ioutil"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	http.HandleFunc("/test", doRequest)      //   设置访问路由
-	err := http.ListenAndServe(":8000", nil) //设置监听的端口
+type Config struct {
+	Addr    string
+	Version string
+}
+
+var config *Config
+
+func init() {
+	loadConfig()
+}
+
+func loadConfig() {
+	config = &Config{}
+	data, err := ioutil.ReadFile("./config.json")
 	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
+		return
+	}
+	//读取的数据为json格式，需要进行解码
+	err = json.Unmarshal(data, config)
+	if err != nil {
+		return
 	}
 }
 
-func doRequest(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	fmt.Fprintf(w, "service start...")
-	var uid string // 初始化定义变量
-	if r.Method == "GET" {
-		uid = r.FormValue("uid")
-	} else if r.Method == "POST" {
-		uid = r.PostFormValue("uid")
-	}
-	io.WriteString(w, "uid = "+uid)
+func statusOKHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"status": "success"})
+}
+
+func versionHandler(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"version": config.Version})
+}
+
+func main() {
+	router := gin.New()
+	router.Use(gin.Recovery())
+	router.GET("/ping", statusOKHandler)
+	router.GET("/version", versionHandler)
+	router.Run(config.Addr)
 }
