@@ -51,6 +51,8 @@ spec:
           volumeMounts:
             - mountPath: /go/src/app/conf
               name: config
+            - mountPath: /go/src/app/pv
+              name: pv
       volumes:
         - name: config
           configMap:
@@ -58,6 +60,9 @@ spec:
             items:
               - key: configkey
                 path: config.json
+        - name: pv
+          persistentVolumeClaim:
+            claimName: pvc-nfs
 
 ---
 apiVersion: v1
