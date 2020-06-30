@@ -14,6 +14,10 @@ docker build -t cbping/gok8s:1.0 .
 # kubectl create configmap gok8s-config --from-file=./config.json
 kubectl create  -f configmap.yaml
 
+# 启动ingress-controller
+# - minikube: minikube addons enable ingress
+# 
+
 # k8s部署
 kubectl apply -f gok8s-demo.yaml
 

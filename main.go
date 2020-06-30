@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,7 @@ func loadConfig() {
 	//读取的数据为json格式，需要进行解码
 	err = json.Unmarshal(data, config)
 	if err != nil {
+		log.Fatal(err)
 		return
 	}
 }
