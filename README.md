@@ -11,7 +11,7 @@ k8s发布go web 项目【学习】
 docker build -t cbping/gok8s:1.0 .
 
 # 创建configmap
-# kubectl create configmap gok8s-config --from-file=./config.json
+# kubectl create configmap gok8s-config --from-file=./conf/config.json
 kubectl create  -f configmap.yaml
 
 # 启动ingress-controller
