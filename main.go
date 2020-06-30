@@ -21,7 +21,7 @@ func init() {
 
 func loadConfig() {
 	config = &Config{}
-	data, err := ioutil.ReadFile("./config.json")
+	data, err := ioutil.ReadFile("./conf/config.json")
 	if err != nil {
 		return
 	}

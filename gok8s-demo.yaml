@@ -30,9 +30,6 @@ spec:
           ports:
             - containerPort: 8080
               protocol: TCP
-          volumeMounts:
-            - mountPath: /go/src/app
-              name: config
           resources:
             limits:
               cpu: 100m
@@ -51,13 +48,16 @@ spec:
               port: 8080
             initialDelaySeconds: 10
             timeoutSeconds: 2
-        volumes:
-          - name: config
-            configMap:
-              name: gok8s-config
-              items:
-                - key: configkey
-                  path: config.json
+          volumeMounts:
+            - mountPath: /go/src/app/conf
+              name: config
+      volumes:
+        - name: config
+          configMap:
+            name: gok8s-config
+            items:
+              - key: configkey
+                path: config.json
 
 ---
 apiVersion: v1
